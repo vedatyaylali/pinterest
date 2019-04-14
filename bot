@@ -1,0 +1,82 @@
+<?php
+error_reporting(E_ALL);
+ini_set('display_errors', 'On');
+set_time_limit(0);
+require('vendor/autoload.php');
+use seregazhuk\PinterestBot\Factories\PinterestBot;
+$bot = PinterestBot::create();
+
+
+
+# DÜZENLENECEK ALAN BAŞLANGIÇ
+//$bot->getHttpClient()->useProxy('192.168.1.1', '12345', 'username:password');
+$bot->auth->login('vedatyy@gmail.com', 'Sevgi8987Vedat!');
+# DÜZENLENECEK ALAN BİTİŞ
+
+
+
+$boards = $bot->boards->forMe();
+
+if($_POST){
+	$newLink = $_POST['link'];
+ 	$board = $boards[$_POST['board']];
+
+ 	$boardId = $board['id'];
+	$boardPinCount = $board['pin_count'];
+
+	$pins = Array();
+
+	foreach ($bot->boards->pins($boardId, $boardPinCount) as $pin) {
+		array_push($pins, $pin);
+	}
+
+
+	foreach ($pins as $pin) {
+		$desc = $pin['description'];
+		$oldLink = $pin['link'];
+		$explode = explode('/', $oldLink);
+		$link = str_replace($explode[0].'/'.$explode[1].'/'.$explode[2], $newLink, $oldLink);
+		echo $bot->pins->edit($pin['id'], $desc, $link);
+		echo '<br>';
+	}
+}
+?>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>BOT</title>
+  </head>
+  <body>
+    
+	<div class="container mt-5">
+		<form action="" method="POST">
+		<div class="form-group">
+		    <label for="link">Yeni Bağlantı</label>
+		    <input type="text" class="form-control form-control-lg" id="link" name="link" placeholder="https://www.sitename.com">
+	  </div>
+		<div class="form-group">
+		    <label for="board">Pano</label>
+		    <select class="form-control form-control-lg" id="board" name="board">
+		      <?php 
+		      	$index = 0;
+		      	foreach ($boards as $board) {
+		      		echo '<option value="'.$index.'">'.$board['name'].'</option>';
+		      		$index++;
+		      	}
+
+		      ?>
+		    </select>
+		</div>
+		<button type="submit" class="btn btn-block btn-primary">Seç</button>
+	</form>
+	</div>
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </body>
+</html>
